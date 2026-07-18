@@ -11,8 +11,7 @@ logs/
 airflow-webserver.pid
 
 # Data
-raw_data/
-gold_data/
+data/
 
 # IDEs
 .idea/

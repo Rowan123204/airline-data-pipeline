@@ -18,13 +18,13 @@ The pipeline processes raw CSV files containing:
 3. `airports.csv`: Dimension table mapping airport IATA codes to city and geographical data.
 
 ## 🚀 Pipeline Workflow (ETL)
-1. **Extract (`extract.py`):** Reads the raw CSV datasets into Spark DataFrames.
-2. **Transform (`transform.py`):**
+1. **Extract (`src/extract.py`):** Reads the raw CSV datasets into Spark DataFrames.
+2. **Transform (`src/transform.py`):**
    - Handles missing values (NULLs) in critical delay columns.
    - Cleans airport codes.
    - Denormalizes the data by joining the fact table (`flights`) with dimension tables (`airlines`, `airports`).
    - Calculates custom metrics (e.g., `TOTAL_DELAY`).
-3. **Load (`load.py`):** Writes the final cleaned dataset into a `gold_data/` folder in highly optimized **Parquet** format.
+3. **Load (`src/load.py`):** Writes the final cleaned dataset into a `data/gold/` folder in highly optimized **Parquet** format.
 4. **Orchestrate (`dags/airline_dag.py`):** Airflow triggers this process automatically on a daily schedule.
 
 ## ⚙️ How to Run Locally

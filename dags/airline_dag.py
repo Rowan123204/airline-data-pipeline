@@ -22,7 +22,7 @@ with DAG(
     run_pipeline = BashOperator(
         task_id='run_pyspark_main',
         # مسار الكود جوه الدوكر اللي هنعمله بعدين
-        bash_command='cd /opt/airflow/project && python3 main.py' 
+        bash_command='cd /opt/airflow/project/src && python3 main.py' 
     )
 
     # ترتيب الـ Tasks
