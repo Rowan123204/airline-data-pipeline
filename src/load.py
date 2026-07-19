@@ -8,8 +8,16 @@ def load(final_df):
     
     final_df.write.mode("overwrite").parquet(tmp_path)
     
-    # 2. Use standard Python to move the files to the Windows-mounted volume
+    # 2. Recreate target folder on Windows mount
     if os.path.exists(final_path):
         shutil.rmtree(final_path)
-    shutil.copytree(tmp_path, final_path)
-    print("✅ Successfully copied Gold data to the mounted volume!")
+    os.makedirs(final_path, exist_ok=True)
+    
+    # 3. Copy file data ONLY (shutil.copyfile does not copy metadata/permissions, avoiding WSL2 error)
+    for item in os.listdir(tmp_path):
+        s = os.path.join(tmp_path, item)
+        d = os.path.join(final_path, item)
+        if os.path.isfile(s):
+            shutil.copyfile(s, d)
+            
+    print("✅ Successfully copied Gold data to the mounted volume using copyfile!")
