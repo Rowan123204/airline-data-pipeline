@@ -31,7 +31,7 @@ The pipeline processes raw CSV files containing:
 
 ### 1. Airflow DAG Success
 The pipeline ran successfully in Apache Airflow, completing all tasks.
-![Airflow Success](images/airflow_success.png)
+![Airflow Success](images/airflow_success_v2.png)
 
 ### 2. Docker Containers
 All infrastructure components running smoothly in Docker Desktop.
