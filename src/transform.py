@@ -50,23 +50,23 @@ def transform(flights, airports, airlines):
     )
 
     # 3. Joins
-    # المشكلة: جدول flights وجدول airlines الاتنين فيهم عمود اسمه AIRLINE
-    # الحل: نغير اسم عمود AIRLINE في جدول الشركات لـ AIRLINE_NAME قبل الدمج
+    # Problem: both flights and airlines tables have a column named AIRLINE
+    # Solution: Rename AIRLINE column in airlines table to AIRLINE_NAME before joining
     clean_airlines = clean_airlines.withColumnRenamed("AIRLINE", "AIRLINE_NAME")
 
-    # دمج جدول الشركات
+    # Join airlines table
     final_df = transformed_flights.join(
         clean_airlines,
         transformed_flights["AIRLINE"] == clean_airlines["IATA_CODE"],
         "left"
     ).drop(clean_airlines["IATA_CODE"])
 
-    # مشكلة خفية جديدة: جدول المطارات فيه أعمدة كتير (زي CITY و STATE). لما ندمجه مرتين، الأعمدة دي هتتكرر.
-    # صيغة Parquet بترفض الحفظ لو في عمودين ليهم نفس الاسم!
-    # الحل: نختار فقط كود المطار واسمه من جدول المطارات قبل الدمج ونتجاهل باقي الأعمدة.
+    # Hidden problem: airports table has many columns (like CITY and STATE). Joining it twice will duplicate columns.
+    # Parquet format rejects saving if there are duplicate column names!
+    # Solution: Select only IATA_CODE and AIRPORT from airports table before joining and ignore the rest.
     clean_airports = clean_airports.select("IATA_CODE", "AIRPORT")
     
-    # دمج مطار الإقلاع
+    # Join origin airport
     final_df = final_df.join(
         clean_airports,
         final_df["ORIGIN_AIRPORT"] == clean_airports["IATA_CODE"],

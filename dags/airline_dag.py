@@ -2,28 +2,28 @@ from airflow import DAG
 from airflow.operators.bash import BashOperator
 from datetime import datetime, timedelta
 
-# إعدادات الـ DAG الأساسية
+# Basic DAG settings
 default_args = {
     'owner': 'data_engineer',
-    'start_date': datetime(2026, 1, 1), # تاريخ بداية التشغيل
-    'retries': 1,                       # لو فشل يجرب مرة كمان
-    'retry_delay': timedelta(minutes=5),# يستنى 5 دقايق قبل ما يجرب تاني
+    'start_date': datetime(2026, 1, 1), # Start date
+    'retries': 1,                       # Retry once on failure
+    'retry_delay': timedelta(minutes=5),# Wait 5 minutes before retrying
 }
 
-# تعريف الـ DAG
+# Define the DAG
 with DAG(
     'airline_pyspark_pipeline',
     default_args=default_args,
-    schedule_interval='@daily', # يشتغل مرة كل يوم
+    schedule_interval='@daily', # Run once a day
     catchup=False
 ) as dag:
 
-    # Task 1: تشغيل المايسترو (main.py) بالكامل
+    # Task 1: Run the main.py pipeline
     run_pipeline = BashOperator(
         task_id='run_pyspark_main',
-        # مسار الكود جوه الدوكر اللي هنعمله بعدين
+        # Path inside the Docker container
         bash_command='cd /opt/airflow/project/src && python3 main.py' 
     )
 
-    # ترتيب الـ Tasks
+    # Task dependencies
     run_pipeline
