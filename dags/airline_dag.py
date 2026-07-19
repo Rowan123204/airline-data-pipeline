@@ -37,14 +37,14 @@ def run_extract(**context):
 
     # Save DataFrames to the project tmp folder (shared via Docker Volume Mount)
     # We use the project directory (not /tmp) so all Airflow workers can access it
-    flights.write.mode("overwrite").parquet("/opt/airflow/project/data/tmp/raw_flights")
-    airports.write.mode("overwrite").parquet("/opt/airflow/project/data/tmp/raw_airports")
-    airlines.write.mode("overwrite").parquet("/opt/airflow/project/data/tmp/raw_airlines")
+    flights.write.mode("overwrite").parquet("/tmp/raw_flights")
+    airports.write.mode("overwrite").parquet("/tmp/raw_airports")
+    airlines.write.mode("overwrite").parquet("/tmp/raw_airlines")
 
     # Push the paths to XCom so the Transform task can find them
-    context['ti'].xcom_push(key='flights_path',  value='/opt/airflow/project/data/tmp/raw_flights')
-    context['ti'].xcom_push(key='airports_path', value='/opt/airflow/project/data/tmp/raw_airports')
-    context['ti'].xcom_push(key='airlines_path', value='/opt/airflow/project/data/tmp/raw_airlines')
+    context['ti'].xcom_push(key='flights_path',  value='/tmp/raw_flights')
+    context['ti'].xcom_push(key='airports_path', value='/tmp/raw_airports')
+    context['ti'].xcom_push(key='airlines_path', value='/tmp/raw_airlines')
 
     print("✅ Extract complete. Raw data saved to data/tmp.")
 
@@ -75,10 +75,10 @@ def run_transform(**context):
     final_df = transform(flights, airports, airlines)
 
     # Save transformed data to shared project tmp folder
-    final_df.write.mode("overwrite").parquet("/opt/airflow/project/data/tmp/transformed_flights")
+    final_df.write.mode("overwrite").parquet("/tmp/transformed_flights")
 
     # Push the output path for the Load task
-    ti.xcom_push(key='transformed_path', value='/opt/airflow/project/data/tmp/transformed_flights')
+    ti.xcom_push(key='transformed_path', value='/tmp/transformed_flights')
 
     print("✅ Transform complete. Cleaned data saved to data/tmp.")
 
