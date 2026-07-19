@@ -27,6 +27,20 @@ The pipeline processes raw CSV files containing:
 3. **Load (`src/load.py`):** Writes the final cleaned dataset into a `data/gold/` folder in highly optimized **Parquet** format.
 4. **Orchestrate (`dags/airline_dag.py`):** Airflow triggers this process automatically on a daily schedule.
 
+## 📸 Project Execution Proof
+
+### 1. Airflow DAG Success
+The pipeline ran successfully in Apache Airflow, completing all tasks.
+![Airflow Success](images/airflow_success.png)
+
+### 2. Docker Containers
+All infrastructure components running smoothly in Docker Desktop.
+![Docker Success](images/docker_success.png)
+
+### 3. PySpark Output (Parquet)
+The processed gold dataset partitioned into Parquet files.
+![Gold Data Output](images/gold_data.png)
+
 ## ⚙️ How to Run Locally
 
 ### Prerequisites
