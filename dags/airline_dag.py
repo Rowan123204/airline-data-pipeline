@@ -28,24 +28,25 @@ def run_extract(**context):
     """
     Task 1 - EXTRACT:
     Reads raw CSV files using PySpark and saves them as
-    Parquet files in a temporary location (/tmp).
+    Parquet files in the project's tmp folder (shared via Volume Mount).
     Pushes the output path to XCom for the next task.
     """
     from extract import extract
 
     flights, airports, airlines = extract()
 
-    # Save DataFrames to temp Parquet files so Transform task can read them
-    flights.write.mode("overwrite").parquet("/tmp/raw_flights")
-    airports.write.mode("overwrite").parquet("/tmp/raw_airports")
-    airlines.write.mode("overwrite").parquet("/tmp/raw_airlines")
+    # Save DataFrames to the project tmp folder (shared via Docker Volume Mount)
+    # We use the project directory (not /tmp) so all Airflow workers can access it
+    flights.write.mode("overwrite").parquet("/opt/airflow/project/data/tmp/raw_flights")
+    airports.write.mode("overwrite").parquet("/opt/airflow/project/data/tmp/raw_airports")
+    airlines.write.mode("overwrite").parquet("/opt/airflow/project/data/tmp/raw_airlines")
 
     # Push the paths to XCom so the Transform task can find them
-    context['ti'].xcom_push(key='flights_path',  value='/tmp/raw_flights')
-    context['ti'].xcom_push(key='airports_path', value='/tmp/raw_airports')
-    context['ti'].xcom_push(key='airlines_path', value='/tmp/raw_airlines')
+    context['ti'].xcom_push(key='flights_path',  value='/opt/airflow/project/data/tmp/raw_flights')
+    context['ti'].xcom_push(key='airports_path', value='/opt/airflow/project/data/tmp/raw_airports')
+    context['ti'].xcom_push(key='airlines_path', value='/opt/airflow/project/data/tmp/raw_airlines')
 
-    print("✅ Extract complete. Raw data saved to /tmp.")
+    print("✅ Extract complete. Raw data saved to data/tmp.")
 
 
 def run_transform(**context):
@@ -73,13 +74,13 @@ def run_transform(**context):
     # Run the transformation logic
     final_df = transform(flights, airports, airlines)
 
-    # Save transformed data to a temp location
-    final_df.write.mode("overwrite").parquet("/tmp/transformed_flights")
+    # Save transformed data to shared project tmp folder
+    final_df.write.mode("overwrite").parquet("/opt/airflow/project/data/tmp/transformed_flights")
 
     # Push the output path for the Load task
-    ti.xcom_push(key='transformed_path', value='/tmp/transformed_flights')
+    ti.xcom_push(key='transformed_path', value='/opt/airflow/project/data/tmp/transformed_flights')
 
-    print("✅ Transform complete. Cleaned data saved to /tmp.")
+    print("✅ Transform complete. Cleaned data saved to data/tmp.")
 
 
 def run_load(**context):
